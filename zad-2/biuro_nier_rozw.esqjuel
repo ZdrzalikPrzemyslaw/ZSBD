@@ -1,0 +1,64 @@
+/* 1 */
+DECLARE @SQL AS VarChar(MAX)
+SET @SQL = ''
+
+SELECT @SQL = @SQL + 'SELECT * FROM ' + TABLE_SCHEMA + '.[' + TABLE_NAME + ']' + CHAR(13)
+FROM INFORMATION_SCHEMA.TABLES
+
+EXEC (@SQL)
+
+/* 2 */
+
+select n.nieruchomoscnr, 
+(select count(*) from biuro.dbo.wizyty w where w.nieruchomoscNr = n.nieruchomoscnr) ile_wizyt,
+(select count(*) from biuro.dbo.wynajecia w where w.nieruchomoscNr = n.nieruchomoscnr) ile_wynajmów from biuro.dbo.nieruchomosci n;
+
+
+/* 3 */
+
+select n.nieruchomoscnr,
+convert(varchar(10), round((cast(n.czynsz * 100 as float) / cast((Select TOP 1 w.czynsz from biuro.dbo.wynajecia w where w.nieruchomoscNr = n.nieruchomoscnr order By w.od_kiedy asc) as float)) - 100, 2)) + '%' as division
+from biuro.dbo.nieruchomosci n 
+
+/* 4 */
+
+select n.nieruchomoscnr, sum(w.czynsz * (DATEDIFF(month, w.od_kiedy, w.do_kiedy) + 1 )) as ile from biuro.dbo.nieruchomosci n, biuro.dbo.wynajecia w
+where w.nieruchomoscNr = n.nieruchomoscnr
+group by n.nieruchomoscnr
+
+/* 5 */
+
+select n.biuroNr, cast(sum(w.czynsz * (DATEDIFF(month, w.od_kiedy, w.do_kiedy) + 1 )) as float) * 0.3 ile from  biuro.dbo.wynajecia w, biuro.dbo.nieruchomosci n
+where (n.nieruchomoscnr = w.nieruchomoscNr) group by n.biuroNr
+
+/* 6 */
+
+/* a */
+
+select n.miasto, count(n.miasto) ilosc_wynajem from biuro.dbo.nieruchomosci n, biuro.dbo.wynajecia w
+where (n.nieruchomoscnr = w.nieruchomoscNr)
+group by n.miasto 
+order by ilosc_wynajem desc
+
+/* b */
+select n.miasto, sum((DATEDIFF(DAY, w.od_kiedy, w.do_kiedy))) ilosc_dni from biuro.dbo.nieruchomosci n, biuro.dbo.wynajecia w
+where (n.nieruchomoscnr = w.nieruchomoscNr)
+group by n.miasto 
+order by ilosc_dni desc
+
+/* 7 */
+
+select distinct wiz.klientnr, wiz.nieruchomoscnr from biuro.dbo.wynajecia w, biuro.dbo.wizyty wiz
+where (w.klientnr = wiz.klientnr)  and (w.nieruchomoscNr = wiz.nieruchomoscnr)
+
+/* 8 */
+
+select distinct k.klientnr from biuro.dbo.klienci k, biuro.dbo.wynajecia w
+where (k.klientnr = w.klientnr) and (w.czynsz > k.max_czynsz)
+
+/* 9 */
+
+select distinct b.biuroNr from biuro.dbo.biura b, biuro.dbo.nieruchomosci n
+where b.biuroNr not in (select n2.biuroNr from biuro.dbo.nieruchomosci n2)
+
+/* 11 */
