@@ -1,3 +1,4 @@
+/* Przemys³aw Zdrzalik 224466 */
 /* 1 */
 DECLARE @SQL AS VarChar(MAX)
 SET @SQL = ''
