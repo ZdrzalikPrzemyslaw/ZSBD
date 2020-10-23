@@ -171,3 +171,87 @@ select object_id('Pracownicy')
 select object_name(object_id('Pracownicy'))
 
 GO
+
+-- 1. --
+IF exists(SELECT 1
+          FROM master.dbo.sysdatabases
+          WHERE name = 'test_cwiczenia')
+    DROP DATABASE test_cwiczenia
+GO
+
+CREATE DATABASE test_cwiczenia
+GO
+
+CREATE TABLE test_cwiczenia..liczby (
+    liczba INT
+)
+GO
+
+DECLARE @i INT
+SET @i = 1
+WHILE @i < 100
+    BEGIN
+        INSERT test_cwiczenia..liczby VALUES (@i)
+        SET @i = @i + 1
+    END
+
+SELECT *
+FROM test_cwiczenia..liczby;
+
+GO
+
+-- 2. --
+
+use test_cwiczenia
+go
+
+if exists(select 1 from sys.objects where TYPE = 'P' and name = 'proc_liczby')
+drop procedure proc_liczby
+GO
+
+create procedure proc_liczby @max int = 10
+as 
+begin
+	select liczba from test_cwiczenia..liczby
+	where liczba <=@max
+end
+go
+
+exec test_cwiczenia..proc_liczby 3
+exec test_cwiczenia..proc_liczby
+go
+
+--- Proszê zmodyfikowaæ przyk³ady - dostosowaæ do w³asnych baz !!! ---
+
+use test_cwiczenia
+
+GO
+-- 1 -- 
+
+if exists(select 1 from sys.objects where name = 'fn_srednia')
+drop function fn_srednia
+GO
+
+
+create function fn_srednia(@rodzaj varchar(25)) returns float
+begin
+	return (select avg(w.czynsz) from biuro.dbo.wynajecia w where w.forma_platnosci=@rodzaj)
+end
+GO
+
+select dbo.fn_srednia('gotówka')
+
+GO
+
+-- 2 --
+
+if exists(select 1 from sys.objects where name = 'funkcja')
+	drop function funkcja
+GO
+
+create function funkcja (@max int) returns table
+return (select * from biuro.dbo.wynajecia where czynsz <= @max)
+Go
+
+select * from funkcja(400)
+GO
