@@ -57,3 +57,29 @@ go
 
 /* 6 */
 
+if exists(select 1 from master.dbo.sysdatabases where name = 'testowa') drop database testowa
+go
+create database testowa
+go
+create table testowa..oddzialy (
+	NR_ODD int primary key identity(1,1),
+	NAZWA_ODD varchar(30))
+go
+
+insert into testowa..oddzialy (NAZWA_ODD) values ('oddzial pierwszy')
+go
+insert into testowa..oddzialy (NAZWA_ODD) values ('oddzial drugi')
+go
+insert into testowa..oddzialy (NAZWA_ODD) values ('oddzial trzeci')
+go
+
+/* 7 */
+
+
+declare @id int = 1
+begin
+	declare @name varchar(30) = (select NAZWA_ODD from testowa..oddzialy where @id = NR_ODD)
+	print 'nazwa oddzialu to ' + @name
+end
+
+/* 8 */
