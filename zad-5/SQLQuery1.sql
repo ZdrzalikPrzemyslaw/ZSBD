@@ -22,4 +22,16 @@ begin
 	insert into test_pracownicy..dziennik (tabela, data, l_wierszy, komunikat) values 
 	('pracownicy', GETDATE(), @@ROWCOUNT, 'Wprowadzono dodatek funkcyjny w wysokoœci ' + cast(@premia as varchar))
 end
+go
 
+/* 3 */
+
+declare @rok int = 1989;
+declare @liczba int;
+begin
+	select @liczba =  count(*) from test_pracownicy..pracownicy p where year(p.data_zatr) = @rok
+	insert into test_pracownicy..dziennik (tabela, data, l_wierszy, komunikat) values 
+	('pracownicy', GETDATE(), @liczba, 'Zatrudniono ' + cast(@liczba as varchar) + ' pracowników w roku ' + cast(@rok as varchar))
+end
+go
+select * from test_pracownicy..dziennik
