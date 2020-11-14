@@ -56,8 +56,55 @@ end
 go
 
 /* 5 */
-
+DROP PROCEDURE IF EXISTS PIERWSZA;
+GO
 CREATE PROCEDURE PIERWSZA
+@first varchar(50)
 AS
-sql_statement
-GO;
+print('Wartosc parametru wynosila: ' + @first)
+RETURN
+GO
+
+Begin
+	exec PIERWSZA 'XD'
+END
+GO
+
+/* 6 */
+DROP PROCEDURE IF EXISTS DRUGA;
+GO
+CREATE PROCEDURE DRUGA
+@first varchar(50) = null,
+@second varchar(100) = 'DRUGA',
+@third int = 1
+AS
+	declare @zmiennaznakowa varchar(100) = 'DRUGA'
+RETURN @second
+GO
+
+/* 7 */
+
+DROP PROCEDURE IF EXISTS TRZECIA;
+GO
+CREATE PROCEDURE TRZECIA
+@id int = 1,
+@procent int = 10
+as
+begin
+	if @id = 0
+	begin
+		update test_pracownicy..pracownicy
+		set placa = placa * (((@procent) / 100.0) + 1 )
+	end
+	else
+	begin
+		update test_pracownicy..pracownicy
+		set placa = placa * (((@procent) / 100.0) + 1 )
+		where id_dzialu  = @id
+	end
+	begin 
+		insert into test_pracownicy..dziennik (tabela, data, l_wierszy, komunikat) values 
+		('pracownicy', GETDATE(), @@ROWCOUNT, 'PODWYZSZONO PLACE O ' + cast(@procent as varchar) + ' PROCENT')
+	end
+end
+GO
