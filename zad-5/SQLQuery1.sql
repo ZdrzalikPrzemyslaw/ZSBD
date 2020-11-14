@@ -34,4 +34,30 @@ begin
 	('pracownicy', GETDATE(), @liczba, 'Zatrudniono ' + cast(@liczba as varchar) + ' pracowników w roku ' + cast(@rok as varchar))
 end
 go
-select * from test_pracownicy..dziennik
+
+/* 4 */
+
+declare @id int = 8902;
+declare @dlugosc int;
+begin
+	select @dlugosc = datediff(year, p.data_zatr, getdate()) from test_pracownicy..pracownicy p where p.nr_akt = @id
+	if @dlugosc >= 15
+		begin
+			insert into test_pracownicy..dziennik (tabela, data, l_wierszy, komunikat) values 
+			('pracownicy', GETDATE(), 1, 'Pracownik ' + cast(@id as varchar) + ' jest zatrudniony dluzej niz 15 lat')
+		end
+	else
+		begin
+			insert into test_pracownicy..dziennik (tabela, data, l_wierszy, komunikat) values 
+			('pracownicy', GETDATE(), 1, 'Pracownik ' + cast(@id as varchar) + ' jest zatrudniony krócej niz 15 lat')
+		end
+
+end
+go
+
+/* 5 */
+
+CREATE PROCEDURE PIERWSZA
+AS
+sql_statement
+GO;
