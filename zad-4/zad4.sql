@@ -1,3 +1,5 @@
+/* Zdrzalik Przemyslaw 224466 */
+
 /* 1 */
 BEGIN
 	print 'Czesc, to ja'
