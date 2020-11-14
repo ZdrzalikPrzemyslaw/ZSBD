@@ -107,4 +107,37 @@ begin
 		('pracownicy', GETDATE(), @@ROWCOUNT, 'PODWYZSZONO PLACE O ' + cast(@procent as varchar) + ' PROCENT')
 	end
 end
+return
 GO
+
+/* 8 */
+
+DROP FUNCTION IF EXISTS CZWARTA;
+GO
+CREATE FUNCTION CZWARTA(@id int) returns float
+as 
+	begin
+		declare @return_percentage float;
+		declare @sum money;
+		declare @sum_in_id  money;
+		select @sum = sum(p.placa) from test_pracownicy..pracownicy p
+		select @sum_in_id = sum(p.placa) from test_pracownicy..pracownicy p where p.id_dzialu = @id;
+		set @return_percentage = ((@sum_in_id / @sum) * 100.0)
+		return @return_percentage
+	end
+GO
+
+select distinct p.id_dzialu, dbo.CZWARTA(p.id_dzialu) as procent from test_pracownicy..pracownicy p
+GO
+
+/* 9 */
+use test_pracownicy
+go
+Create Trigger do_archiwum
+on pracownicy
+for delete
+as
+
+insert into test_pracownicy..prac_archiw (nr_akt, nazwisko, stanowisko, kierownik, data_zatr, data_zwol, placa, dod_funkcyjny, prowizja, id_dzialu) 
+select d.nr_akt, d.nazwisko, d.stanowisko, d.kierownik, d.data_zatr, GETDATE(), d.placa, d.dod_funkcyjny, d.prowizja, d.id_dzialu from deleted d
+go
